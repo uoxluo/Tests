@@ -1,0 +1,36 @@
+<html>
+    <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.plot.ly/plotly-latest.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+    <body>
+    <span>Real-Time Chart with Plotly.js</span>
+    <div class="wrapper">
+        <div id="chart"></div>
+        <script>
+            function getData()
+            {
+                return Math.random();
+            }  
+            Plotly.plot('chart', [{y:[getData()], type:'line'}]);
+            var cnt = 0;
+            function updatePlot()
+            {
+                Plotly.extendTraces('chart',{ y:[[getData()]]}, [0]);
+                cnt++;
+                if(cnt > 100)
+                {
+                    Plotly.relayout('chart', {xaxis:{range: [cnt-100,cnt]}});
+                }
+            }
+            var interval = setInterval(updatePlot, 100);
+            function stop()
+            {  
+                clearInterval(interval);
+            }
+        </script>
+    </div>
+    <button onclick = "stop()"> Stop </button>
+    </body>
+</html>
