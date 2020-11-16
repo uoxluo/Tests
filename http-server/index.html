@@ -1,48 +1,51 @@
-<!DOCTYPE html>
 <!-- This is an HTML5 file -->
-<html>
-<!-- The root element -->
+<!DOCTYPE html>
+<html><!DOCTYPE html>
 
 <head>
-    <!-- Title, scripts & styles go here -->
-    <title>Digital Clock</title>
-    <script>
-        // A script of js code
-        // Define a function to display the current time
-        function displayTime() {
-            var elt = document.getElementById("clock"); // Find element with id="clock"
-            var now = new Date();
-            // Get current time
-            elt.innerHTML = now.toLocaleTimeString();
-            // Make elt display it
-            setTimeout(displayTime, 1000);
-            // Run again in 1 second
-        }
-        window.onload = displayTime; // Start displaying the time when document loads.
-    </script>
-    <style>
-        /* A CSS stylesheet for the clock */
-        #clock {
-            /* Style apply to element with id="clock" */
-            font: bold 24pt sans;
-            /* Use a big bold font */
-            background: #ddf;
-            /* On a light bluish-gray background */
-            padding: 10px;
-            /* Surround it with some space */
-            border: solid black 2px;
-            /* And a solid black border */
-            border-radius: 10px;
-            /* Round the corners (where supported) */
-        }
-    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 
 <body>
-    <!-- The body is the displayed parts of the doc. -->
-    <h1>Digital Clock</h1>
-    <!-- Display a title -->
-    <span id="clock"></span> <!-- The time gets inserted here -->
+    <span>Real-Time Chart with Plotly.js</span>
+    <div id="chart"></div>
+    <script>
+        var socket = new WebSocket("ws://" + location.host + ":81");
+        var number;
+        socket.onmessage = function(event)
+        {
+            number = Number(event.data);
+        }
+        function getData() {
+            return Math.random();
+        }
+        Plotly.plot('chart', [{ y: [number], type: 'line' }]);
+        var cnt = 0;
+        function updatePlot()
+        {
+            Plotly.extendTraces('chart', { y: [[number]] }, [0]);
+            cnt++;
+            if (cnt > 100) {
+                Plotly.relayout('chart', { xaxis: { range: [cnt - 100, cnt] } });
+            }
+        }
+        var interval = setInterval(updatePlot, 100);
+        function stop()
+        {
+            var button = document.getElementById("button");
+            if (button.innerHTML == "Stop")
+            {
+                clearInterval(interval);
+                button.innerHTML = "Start";
+            }
+            else if (button.innerHTML == "Start")
+            {
+                interval = setInterval(updatePlot, 100);
+                button.innerHTML = "Stop";
+            }
+        }
+    </script>
+    <button id="button" onclick="stop()">Stop</button>
 </body>
 
 </html>
